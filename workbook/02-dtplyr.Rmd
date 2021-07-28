@@ -19,8 +19,8 @@ library(purrr)
 
 Read the **transactions.csv** file, from the **../data** folder. Use the `fread()` function to load the data into a variable called `transactions`
 ```{r}
-transactions <- dir_ls("../data", glob = "*.csv") |>
-   map(fread) |>
+transactions <- dir_ls("../data", glob = "*.csv") %>%
+   map(fread) %>%
    rbindlist()
 ```
 
@@ -31,12 +31,12 @@ glimpse(transactions)
 
 Use `lazy_dt()` to "wrap" the `transactions` variable into a new variable called `dt_transactions`
 ```{r}
-
+dt_transactions <- lazy_dt(transactions)
 ```
 
 View `dt_transactions` structure with `glimpse()`
 ```{r}
-
+glimpse(dt_transactions)
 ```
 
 ## Object sizes
@@ -54,12 +54,12 @@ obj_size(transactions)
 
 Use `obj_size()` to obtain `dt_transactions`'s size in memory
 ```{r}
-
+obj_size(dt_transactions)
 ```
 
 Use `obj_size()` to obtain `dt_transactions` and `transactions` size in memory together
 ```{r}
-
+obj_size(dt_transactions, transactions)
 ```
 
 ## How `dtplyr` works
@@ -67,30 +67,34 @@ Use `obj_size()` to obtain `dt_transactions` and `transactions` size in memory t
 
 Use `dplyr` verbs on top of `dt_transactions` to obtain the total sales by month
 ```{r}
-dt_transactions |>
-  group_by(date_month) |>
+dt_transactions %>%
+  group_by(date_month) %>%
   summarise(total_sales = sum(price))
 ```
 
 Load the above code into a variable called `by_month`
 ```{r}
-
+by_month <- dt_transactions %>%
+  group_by(date_month) %>%
+  summarise(total_sales = sum(price))
 ```
 
 Use `show_query()` to see the `data.table` code that `by_month` actually runs
 ```{r}
-
+show_query(by_month)
 ```
 
 Create a new column using `mutate()`
 ```{r}
-dt_transactions |>
+dt_transactions %>%
   mutate(new_field = price / 2)
 ```
 
 Use `show_query()` to see the `copy()` command being used
 ```{r}
-
+dt_transactions %>%
+  mutate(new_field = price / 2) %>% 
+  show_query()
 ```
 
 Check to confirm that the new column *did not* persist in `dt_transactions`
@@ -109,18 +113,20 @@ m_transactions
 
 Create a `new_field` column in `m_transactions` using `mutate()`
 ```{r}
-m_transactions |> 
+m_transactions %>% 
   mutate(new_field = price / 2)
 ```
 
 Use `show_query()` to see that `copy()` is no longer being used
 ```{r}
-
+m_transactions %>% 
+  mutate(new_field = price / 2) %>% 
+  show_query()
 ```
 
 Inspect `m_transactions` to see that `new_field` has persisted
 ```{r}
-
+m_transactions
 ```
 
 ## Working with `dtplyr`
@@ -128,7 +134,7 @@ Inspect `m_transactions` to see that `new_field` has persisted
 
 Use `as_tibble()` to convert the results of `by_month` into a `tibble`
 ```{r}
-by_month |>
+by_month %>%
   as_tibble()
 ```
 
@@ -139,8 +145,8 @@ library(ggplot2)
 
 Use `as_tibble()` to convert before creating a line plot 
 ```{r}
-by_month |>
-  as_tibble() |>
+by_month %>%
+  as_tibble() %>%
   ggplot() +
   geom_line(aes(date_month, total_sales))
 ```
@@ -155,14 +161,14 @@ library(tidyr)
 
 Group `db_transactions` by `date_month` and `date_day`, then aggregate `price` into `total_sales`
 ```{r}
-dt_transactions |>
-  group_by(date_month, date_day) |> 
+dt_transactions %>%
+  group_by(date_month, date_day) %>% 
   summarise(total_sales = sum(price))
 ```
 
 Copy the aggregation code above, **collect it into a `tibble`**, and then use `pivot_wider()` to make the `date_day` the column headers.
 ```{r}
-dt_transactions |>
+dt_transactions %>%
   mutate(date_day = factor(date_day, levels = c(
     "Monday", 
     "Tuesday", 
@@ -171,9 +177,9 @@ dt_transactions |>
     "Friday", 
     "Saturday", 
     "Sunday"
-  ))) |>
-  group_by(date_month, date_day) |> 
-  summarise(total_sales = sum(price)) |>
-  as_tibble() |>
+  ))) %>%
+  group_by(date_month, date_day) %>% 
+  summarise(total_sales = sum(price)) %>%
+  as_tibble() %>%
   pivot_wider(names_from = date_day, values_from = total_sales)
 ```

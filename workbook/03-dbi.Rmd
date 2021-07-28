@@ -50,17 +50,17 @@ dbListTables(con@con)
 
 Use `dbWriteTable()` to create a new table using `mtcars` data. Name it **db_mtcars**
 ```{r}
-
+dbWriteTable(con, "db_mtcars", mtcars)
 ```
 
 Use `dbListTables()` to view existing tables, it should return **db_mtcars**
 ```{r}
-
+dbListTables(con@con)
 ```
 
 Use `dbGetQuery()` to pass a SQL query to the database
 ```{r}
-
+dbGetQuery(con, "SELECT * FROM db_mtcars")
 ```
 
 Close the database connection using `connection_close()`
@@ -78,7 +78,7 @@ con <- connection_open(RSQLite::SQLite(), "mydatabase.sqlite")
 
 Use `dbWriteTable()` to re-create the **db_mtcars** table using `mtcars` data
 ```{r, eval = FALSE}
-
+dbWriteTable(con, "db_mtcars", mtcars)
 ```
 
 ```
@@ -87,22 +87,22 @@ Use `dbWriteTable()` to re-create the **db_mtcars** table using `mtcars` data
 
 Use the `append` argument in `dbWriteTable()` to add to the data in the **db_mtcars** table
 ```{r}
-
+dbWriteTable(con, "db_mtcars", mtcars, append = TRUE)
 ```
 
 Using `dbGetQuery()`, check the current record count of **db_mtcars** with the following query: "select count() from db_mtcars"
 ```{r}
-
+dbGetQuery(con, "SELECT count() FROM db_mtcars")
 ```
 
 Use the `overwrite` argument to `dbWriteTable()` to replace the data in the **db_mtcars** table
 ```{r, eval = TRUE}
-
+dbWriteTable(con, "db_mtcars", mtcars, overwrite = TRUE)
 ```
 
 Check the record count of `db_mtcars` again
 ```{r}
-
+dbGetQuery(con, "SELECT count() FROM db_mtcars")
 ```
 
 ## Database operations
