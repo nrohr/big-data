@@ -59,15 +59,12 @@ transactions %>%
 
 ## Visualization
 
-Load the `ggplot2` library
+Load the `ggplot2` library and create a line plot:
 ```{r}
 library(ggplot2)
-```
 
-Use `as_tibble()` to convert before creating a line plot 
-```{r}
 by_month %>% 
-  as_tibble() %>% 
+  # as_tibble() %>%  # We'll need this later
   ggplot() +
   geom_line(aes(date_month, total_sales))
 ```
