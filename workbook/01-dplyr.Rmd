@@ -64,7 +64,6 @@ Load the `ggplot2` library and create a line plot:
 library(ggplot2)
 
 by_month %>% 
-  # as_tibble() %>%  # We'll need this later
   ggplot() +
   geom_line(aes(date_month, total_sales))
 ```
